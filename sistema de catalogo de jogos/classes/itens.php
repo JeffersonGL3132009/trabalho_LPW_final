@@ -49,8 +49,8 @@ public function setimagem($imagem){
         $stmt = $ligar->prepare($sql);
 
         $stmt->bindParam(':nome',$this->nome);
-        $stmt->bindParam(':email',$this->tipo);
-        $stmt->bindParam(':senha',$this->imagem);
+        $stmt->bindParam(':tipo',$this->tipo);
+        $stmt->bindParam(':imagem',$this->imagem);
 
         $stmt->execute();
         } catch (PDOException $e){
@@ -78,7 +78,7 @@ public function setimagem($imagem){
         $conexao = new conexao();
         $arranque = $conexao->getconexao();
 
-        $sql = "UPDATE usuario
+        $sql = "UPDATE itens
                 SET nomei = :nome,
                     tipo = :tipo,
                     imagem = :imagem

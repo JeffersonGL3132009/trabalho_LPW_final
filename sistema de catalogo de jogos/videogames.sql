@@ -23,11 +23,9 @@ FOREIGN key (iduc) references usuario(idu));
 CREATE TABLE info(
 idf INT primary KEY not null AUTO_INCREMENT,
 itemi INT,
-usiu INT,
 datalanca DATE,
 descricao VARCHAR(200),
 foreign key (itemi) references itens(idi),
-foreign key (usiu) references usuario(idu)
 );
 
 

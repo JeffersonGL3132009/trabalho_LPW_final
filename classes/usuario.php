@@ -74,6 +74,23 @@ class usuario{
         }
     }
 
+    public function buscarPorEmail($email){
+        try{
+        $conexao = new conexao();
+        $ligar = $conexao->getconexao();
+
+        $sql = "SELECT * FROM usuario WHERE emailu = :email";
+
+        $stmt = $ligar->prepare($sql);
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+        }catch(PDOException $e){
+            echo "Erro de autenticação:".$e->getMessage()." por favor, tente novamente.";
+        }
+    }
+
     public function atualizar($id, $nome, $email, $senha){
         try{
         $conexao = new conexao();

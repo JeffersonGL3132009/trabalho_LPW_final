@@ -1,120 +1,118 @@
 <?php
 require_once "conexao.php";
+
 class itens{
-private $id;
-private $nome;
-private $tipo;
-private $imagem;
+    private $id;
+    private $nome;
+    private $tipo;
+    private $nota;
+    private $analise;
+    private $erro;
 
-public function __construct($id =0,$nome = '',$tipo = '',$imagem = '' ){
-    $this->id = $id;
-    $this->nome = $nome;
-    $this->tipo = $tipo;
-    $this->imagem = $imagem;
-}
-
-public function getid(){
-    return $this->id;
-}
-public function getnome(){
-    return $this->nome;
-}
-public function gettipo(){
-    return $this->tipo;
-}
-public function getimagem(){
-    return $this->imagem;
-}
-public function setid($id){
-    $this->id = $id;
-}
-public function setnome($nome){
-    $this->nome = $nome;
-}
-public function settipo($tipo){
-    $this->tipo = $tipo;
-}
-public function setimagem($imagem){
-    $this->imagem = $imagem;
-}
-
- public function salvar(){
-        try{
-        $conexao = new conexao();
-        $ligar = $conexao->getconexao();
-
-        $sql = "INSERT INTO itens(nomei,tipo,imagem) 
-                VALUES (:nome,:tipo,:imagem)";
-
-        $stmt = $ligar->prepare($sql);
-
-        $stmt->bindParam(':nome',$this->nome);
-        $stmt->bindParam(':tipo',$this->tipo);
-        $stmt->bindParam(':imagem',$this->imagem);
-
-        $stmt->execute();
-        } catch (PDOException $e){
-            echo "Erro de cadastro:".$e->getMessage()." por favor, tente novamente.";
-        }
-
+    public function __construct($id = 0, $nome = '', $tipo = '', $nota = null, $analise = ''){
+        $this->id = $id;
+        $this->nome = $nome;
+        $this->tipo = $tipo;
+        $this->nota = $nota;
+        $this->analise = $analise;
     }
+
+    public function getid(){ return $this->id; }
+    public function getnome(){ return $this->nome; }
+    public function gettipo(){ return $this->tipo; }
+    public function getnota(){ return $this->nota; }
+    public function getanalise(){ return $this->analise; }
+    public function getErro(){ return $this->erro; }
+
+    public function salvar(){
+        try{
+            $conexao = new conexao();
+            $ligar = $conexao->getconexao();
+
+            $sql = "INSERT INTO itens(nomei, tipo, nota, analise)
+                    VALUES (:nome, :tipo, :nota, :analise)";
+
+            $stmt = $ligar->prepare($sql);
+            $stmt->bindParam(':nome', $this->nome);
+            $stmt->bindParam(':tipo', $this->tipo);
+            $stmt->bindParam(':nota', $this->nota);
+            $stmt->bindParam(':analise', $this->analise);
+
+            return $stmt->execute();
+        } catch (PDOException $e){
+            $this->erro = $e->getMessage();
+            return false;
+        }
+    }
+
     public function listar(){
         try{
-        $conexao = new conexao();
-        $ligar = $conexao->getconexao();
+            $conexao = new conexao();
+            $ligar = $conexao->getconexao();
 
-        $sql = "SELECT * FROM itens";
+            $sql = "SELECT * FROM itens ORDER BY idi DESC";
+            $stmt = $ligar->query($sql);
 
-        $stmt = $ligar->query($sql);
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }catch(PDOException $e){
-            echo "Erro de exibição:".$e->getMessage()." por favor, tente novamente.";
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e){
+            $this->erro = $e->getMessage();
+            return [];
         }
     }
 
-    public function atualizar($id, $nome, $tipo, $imagem){
+    public function buscarPorId($id){
         try{
-        $conexao = new conexao();
-        $arranque = $conexao->getconexao();
+            $conexao = new conexao();
+            $ligar = $conexao->getconexao();
 
-        $sql = "UPDATE itens
-                SET nomei = :nome,
-                    tipo = :tipo,
-                    imagem = :imagem
-                WHERE idi = :id";
+            $sql = "SELECT * FROM itens WHERE idi = :id";
+            $stmt = $ligar->prepare($sql);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
 
-        $stmt = $arranque->prepare($sql);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e){
+            $this->erro = $e->getMessage();
+            return false;
+        }
+    }
 
-        $stmt->bindParam(':nome', $nome);
-        $stmt->bindParam(':tipo', $tipo);
-        $stmt->bindParam(':imagem', $imagem);
-        $stmt->bindParam(':id', $id);
+    public function atualizar($id, $nome, $tipo, $nota, $analise){
+        try{
+            $conexao = new conexao();
+            $ligar = $conexao->getconexao();
 
-        return $stmt->execute();
-        }catch(PDOException $e){
-            echo "Erro de atualização:".$e->getMessage()." por favor, tente novamente.";
+            $sql = "UPDATE itens
+                    SET nomei = :nome, tipo = :tipo, nota = :nota, analise = :analise
+                    WHERE idi = :id";
+
+            $stmt = $ligar->prepare($sql);
+            $stmt->bindParam(':nome', $nome);
+            $stmt->bindParam(':tipo', $tipo);
+            $stmt->bindParam(':nota', $nota);
+            $stmt->bindParam(':analise', $analise);
+            $stmt->bindParam(':id', $id);
+
+            return $stmt->execute();
+        } catch (PDOException $e){
+            $this->erro = $e->getMessage();
+            return false;
         }
     }
 
     public function excluir($id){
         try{
-         $conexao = new conexao();
-        $arranque = $conexao->getconexao();
+            $conexao = new conexao();
+            $ligar = $conexao->getconexao();
 
-        $sql = "DELETE FROM itens
-                WHERE idi = :id";
+            $sql = "DELETE FROM itens WHERE idi = :id";
+            $stmt = $ligar->prepare($sql);
+            $stmt->bindParam(':id', $id);
 
-        $stmt = $arranque->prepare($sql);
-
-        $stmt->bindParam(':id', $id);
-
-        return $stmt->execute();
-        }catch(PDOException $e){
-            echo "Erro de exclusão:".$e->getMessage()." por favor, tente novamente.";
+            return $stmt->execute();
+        } catch (PDOException $e){
+            $this->erro = $e->getMessage();
+            return false;
         }
     }
-
 }
-
-?>
